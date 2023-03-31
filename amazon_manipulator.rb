@@ -14,8 +14,8 @@ class AmazonManipulator
     @account = read(account_file) # <5>
   end
 
-  def run
-    @driver.get 'https://www.amazon.co.jp/'
+  def login #<1>
+    @driver.get BASE_URL
     element = @driver.find_element(:id, 'nav-link-accountList')
     puts element.text
     element.click
@@ -30,8 +30,24 @@ class AmazonManipulator
     element = @driver.find_element(:id, 'signInSubmit')
     element.click
     @wait.until { @driver.find_element(:id, 'nav-link-accountList').displayed? }
-    sleep 3
-    @driver.quit
+  end
+
+  def logout #<2>
+    @wait.until { @driver.find_element(:id, 'nav-link-accountList').displayed? }
+    element = @driver.find_element(:id, 'nav-link-accountList' )
+    @driver.action.move_to(element).perform #<3>
+    @wait.until {@driver.find_element(:id, 'nav-item-signout').displayed? }
+    element = @driver.find_element(:id, 'nav-item-signout') #<4>
+    element.click #<5>
+    @wait.until { @driver.find_element(:id, 'ap_email').displayed? } #<6>
+  end
+
+  def run #<7>
+    login
+    sleep 3 #<8>
+    logout
+    sleep 3 #<9>
+    @driver.quit #<10>
   end
 end
 
